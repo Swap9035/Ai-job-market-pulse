@@ -1,0 +1,19 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Node
+node_modules/
+build/
+
+# Data (don't commit large files)
+data/*.csv
+data/*.json
+
+# VS Code
+.vscode/
+
+# Models
+backend/models/*.pkl

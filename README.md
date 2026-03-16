@@ -39,4 +39,4 @@ ai-job-market-pulse/
 *Setup instructions coming as project develops*
 
 ##  Author
-Your Name — Swapnil Patil | Swap9035
+Swapnil Patil | Swap9035

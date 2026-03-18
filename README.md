@@ -38,5 +38,5 @@ ai-job-market-pulse/
 ##  How to Run Locally
 *Setup instructions coming as project develops*
 
-## 👤 Author
- Swapnil Patil | Swap9035
+##  Author
+Swapnil Patil | Swap9035

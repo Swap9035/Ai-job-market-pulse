@@ -1,31 +1,20 @@
-# app.py — the heart of your Flask backend
-# This file creates the API that your React frontend will talk to
+# app.py — Flask REST API connected to real MongoDB data
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
+from db import jobs_collection, skills_collection
 import os
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Create the Flask application
-# __name__ tells Flask where to look for files
 app = Flask(__name__)
-
-# CORS = Cross-Origin Resource Sharing
-# Without this, your browser BLOCKS React (port 3000)
-# from talking to Flask (port 5000) — a security rule
-# CORS(app) says "allow all origins" — fine for development
 CORS(app)
 
 
 # ─────────────────────────────────────────
 # ROUTE 1: Health Check
 # ─────────────────────────────────────────
-# A health check is standard in every API
-# It lets you quickly verify the server is running
-# Visit http://localhost:5000/ to test this
 @app.route("/")
 def health_check():
     return jsonify({
@@ -36,121 +25,116 @@ def health_check():
 
 
 # ─────────────────────────────────────────
-# ROUTE 2: Get All Jobs
+# ROUTE 2: Get All Jobs (REAL MongoDB data)
 # ─────────────────────────────────────────
-# GET /api/jobs returns a list of job postings
-# We use /api/ prefix on all data routes — this is convention
 @app.route("/api/jobs")
 def get_jobs():
-    # For now we return mock (fake) data
-    # On Day 3 we replace this with real MongoDB data
-    mock_jobs = [
-        {
-            "id": 1,
-            "title": "Data Analyst",
-            "company": "Infosys",
-            "location": "Bangalore",
-            "skills": ["Python", "SQL", "Excel", "Power BI"],
-            "salary_range": "4-8 LPA",
-            "job_type": "Full-time",
-            "date_posted": "2024-01-15"
-        },
-        {
-            "id": 2,
-            "title": "Machine Learning Engineer",
-            "company": "TCS",
-            "location": "Hyderabad",
-            "skills": ["Python", "TensorFlow", "scikit-learn", "Docker"],
-            "salary_range": "8-15 LPA",
-            "job_type": "Full-time",
-            "date_posted": "2024-01-14"
-        },
-        {
-            "id": 3,
-            "title": "Data Scientist",
-            "company": "Wipro",
-            "location": "Pune",
-            "skills": ["Python", "R", "Machine Learning", "Statistics", "SQL"],
-            "salary_range": "6-12 LPA",
-            "job_type": "Full-time",
-            "date_posted": "2024-01-13"
-        },
-        {
-            "id": 4,
-            "title": "Data Engineer",
-            "company": "HCL Technologies",
-            "location": "Chennai",
-            "skills": ["Python", "Spark", "Hadoop", "SQL", "AWS"],
-            "salary_range": "7-14 LPA",
-            "job_type": "Full-time",
-            "date_posted": "2024-01-12"
-        },
-        {
-            "id": 5,
-            "title": "Business Intelligence Analyst",
-            "company": "Accenture",
-            "location": "Mumbai",
-            "skills": ["SQL", "Tableau", "Power BI", "Excel"],
-            "salary_range": "5-10 LPA",
-            "job_type": "Full-time",
-            "date_posted": "2024-01-11"
-        }
-    ]
+    try:
+        # Query MongoDB — find() returns all documents
+        # We exclude the MongoDB _id field (it's not JSON serializable)
+        jobs = list(jobs_collection.find({}, {"_id": 0}))
 
-    return jsonify({
-        "success": True,
-        "count": len(mock_jobs),
-        "data": mock_jobs
-    })
+        return jsonify({
+            "success": True,
+            "count": len(jobs),
+            "data": jobs
+        })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 
 # ─────────────────────────────────────────
-# ROUTE 3: Get Top Skills
+# ROUTE 3: Get Skills (REAL MongoDB data)
 # ─────────────────────────────────────────
-# GET /api/skills returns skill frequency data
-# This will power the bar chart in your dashboard
 @app.route("/api/skills")
 def get_skills():
-    # Mock skill frequency data
-    # Number = how many job postings mention this skill
-    mock_skills = [
-        {"skill": "Python", "count": 450, "category": "Programming"},
-        {"skill": "SQL", "count": 380, "category": "Database"},
-        {"skill": "Machine Learning", "count": 290, "category": "AI/ML"},
-        {"skill": "Power BI", "count": 240, "category": "Visualization"},
-        {"skill": "Excel", "count": 220, "category": "Tools"},
-        {"skill": "Tableau", "count": 180, "category": "Visualization"},
-        {"skill": "TensorFlow", "count": 160, "category": "AI/ML"},
-        {"skill": "AWS", "count": 150, "category": "Cloud"},
-        {"skill": "Statistics", "count": 140, "category": "Mathematics"},
-        {"skill": "R", "count": 120, "category": "Programming"},
-    ]
+    try:
+        # Sort by count descending — most demanded first
+        skills = list(skills_collection.find(
+            {},
+            {"_id": 0}
+        ).sort("count", -1).limit(10))
 
-    return jsonify({
-        "success": True,
-        "count": len(mock_skills),
-        "data": mock_skills
-    })
+        return jsonify({
+            "success": True,
+            "count": len(skills),
+            "data": skills
+        })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 
 # ─────────────────────────────────────────
-# ROUTE 4: Get Single Job by ID
+# ROUTE 4: Filter Jobs by Category
 # ─────────────────────────────────────────
-# The <int:job_id> part is a URL parameter
-# GET /api/jobs/1 will call this with job_id = 1
-@app.route("/api/jobs/<int:job_id>")
-def get_job(job_id):
-    # Placeholder — will connect to MongoDB on Day 3
-    return jsonify({
-        "success": True,
-        "message": f"Job {job_id} details coming on Day 3 with MongoDB"
-    })
+# GET /api/jobs?category=Machine Learning
+# The ?category= part is a query parameter
+@app.route("/api/jobs/filter")
+def filter_jobs():
+    try:
+        category = request.args.get("category", "")
+        location = request.args.get("location", "")
+
+        # Build query dynamically based on what was provided
+        query = {}
+        if category:
+            query["category"] = category
+        if location:
+            query["location"] = location
+
+        jobs = list(jobs_collection.find(query, {"_id": 0}))
+
+        return jsonify({
+            "success": True,
+            "count": len(jobs),
+            "filters": {"category": category, "location": location},
+            "data": jobs
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # ─────────────────────────────────────────
-# Run the server
+# ROUTE 5: Get Job Categories Summary
 # ─────────────────────────────────────────
-# debug=True means: auto-restart when you save changes
-# You never need to stop and restart the server manually
+# Uses MongoDB aggregation pipeline
+# Think of it as: GROUP BY category, COUNT(*)
+@app.route("/api/jobs/categories")
+def get_categories():
+    try:
+        pipeline = [
+            # Stage 1: Group by category and count
+            {"$group": {
+                "_id": "$category",
+                "count": {"$sum": 1},
+                "avg_salary_min": {"$avg": "$salary_min"}
+            }},
+            # Stage 2: Sort by count descending
+            {"$sort": {"count": -1}},
+            # Stage 3: Rename _id to category
+            {"$project": {
+                "_id": 0,
+                "category": "$_id",
+                "count": 1,
+                "avg_salary_min": {"$round": ["$avg_salary_min", 0]}
+            }}
+        ]
+
+        categories = list(jobs_collection.aggregate(pipeline))
+
+        return jsonify({
+            "success": True,
+            "data": categories
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -1,6 +1,3 @@
-// Dashboard.jsx — the main page
-// Shows summary stats + top skills chart
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -8,20 +5,19 @@ import {
   Tooltip, ResponsiveContainer
 } from 'recharts';
 import JobCard from '../components/JobCard';
+import SalaryChart from '../components/SalaryChart';
+import LocationChart from '../components/LocationChart';
+import ExperienceChart from '../components/ExperienceChart';
 
-// Base URL for our Flask API
 const API_URL = 'http://localhost:5000';
 
 function Dashboard() {
-  // State variables — when these change, React re-renders
   const [jobs, setJobs] = useState([]);
   const [skills, setSkills] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // useEffect runs when component first loads
-  // The [] means "run only once on mount"
   useEffect(() => {
     fetchData();
   }, []);
@@ -29,14 +25,11 @@ function Dashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Fetch all data in parallel using Promise.all
-      // This is faster than fetching one by one
       const [jobsRes, skillsRes, categoriesRes] = await Promise.all([
         axios.get(`${API_URL}/api/jobs`),
         axios.get(`${API_URL}/api/skills`),
         axios.get(`${API_URL}/api/jobs/categories`)
       ]);
-
       setJobs(jobsRes.data.data);
       setSkills(skillsRes.data.data);
       setCategories(categoriesRes.data.data);
@@ -65,10 +58,12 @@ function Dashboard() {
   return (
     <div className="space-y-6">
 
-      {/* Page Header */}
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Job Market Dashboard</h1>
-        <p className="text-gray-500 mt-1">Real-time analysis of data science job trends in India</p>
+        <p className="text-gray-500 mt-1">
+          Real-time analysis of data science job trends in India
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -90,11 +85,19 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Top Skills Bar Chart */}
+      {/* Top Skills Chart */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h2 className="font-semibold text-gray-900 mb-4">Top 10 Most Demanded Skills</h2>
+        <h2 className="font-semibold text-gray-900 mb-1">
+          Top 10 Most Demanded Skills
+        </h2>
+        <p className="text-xs text-gray-400 mb-4">
+          Based on job posting frequency
+        </p>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={skills} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
+          <BarChart
+            data={skills}
+            margin={{ top: 5, right: 20, left: 0, bottom: 60 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
               dataKey="skill"
@@ -104,16 +107,30 @@ function Dashboard() {
             />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip
-              contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
+              contentStyle={{
+                borderRadius: '8px',
+                border: '1px solid #e2e8f0'
+              }}
             />
             <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
+      {/* Salary + Location Charts side by side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SalaryChart />
+        <LocationChart />
+      </div>
+
+      {/* Experience Chart */}
+      <ExperienceChart />
+
       {/* Recent Jobs */}
       <div>
-        <h2 className="font-semibold text-gray-900 mb-4">Recent Job Postings</h2>
+        <h2 className="font-semibold text-gray-900 mb-4">
+          Recent Job Postings
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {jobs.slice(0, 4).map((job, index) => (
             <JobCard key={index} job={job} />

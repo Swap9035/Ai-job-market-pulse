@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Skills from './pages/Skills';
 import JobList from './pages/JobList';
-import './index.css';
+import SkillGap from './pages/SkillGap';
 
 function App() {
   return (
@@ -16,6 +16,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/skills" element={<Skills />} />
             <Route path="/jobs" element={<JobList />} />
+            <Route path="/skill-gap" element={<SkillGap />} />
           </Routes>
         </main>
       </div>

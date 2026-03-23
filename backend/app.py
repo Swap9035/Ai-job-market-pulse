@@ -134,6 +134,99 @@ def get_categories():
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+    
+# ─────────────────────────────────────────
+# ROUTE 10: Skill Gap Analyzer
+# ─────────────────────────────────────────
+# POST /api/skill-gap
+# User sends: their skills + target role
+# We return: what skills they have, what they're missing,
+#            how common each missing skill is
+@app.route("/api/skill-gap", methods=["POST"])
+def skill_gap():
+    try:
+        # Get data from request body
+        body = request.get_json()
+        user_skills = body.get("skills", [])
+        target_role = body.get("target_role", "")
+
+        # Convert user skills to lowercase for comparison
+        user_skills_lower = [s.lower().strip() for s in user_skills]
+
+        # Find all jobs matching the target role category
+        if target_role:
+            matching_jobs = list(jobs_collection.find(
+                {"category": target_role},
+                {"_id": 0, "skills": 1}
+            ))
+        else:
+            matching_jobs = list(jobs_collection.find(
+                {},
+                {"_id": 0, "skills": 1}
+            ))
+
+        if not matching_jobs:
+            return jsonify({
+                "success": False,
+                "error": f"No jobs found for role: {target_role}"
+            }), 404
+
+        # Count skill frequency across matching jobs
+        skill_freq = {}
+        for job in matching_jobs:
+            for skill in job.get("skills", []):
+                skill_lower = skill.lower()
+                if skill_lower not in skill_freq:
+                    skill_freq[skill_lower] = {
+                        "skill": skill,
+                        "count": 0
+                    }
+                skill_freq[skill_lower]["count"] += 1
+
+        total_jobs = len(matching_jobs)
+
+        # Build the gap analysis
+        have = []
+        missing = []
+
+        for skill_lower, info in skill_freq.items():
+            percentage = round((info["count"] / total_jobs) * 100)
+            skill_data = {
+                "skill": info["skill"],
+                "count": info["count"],
+                "total_jobs": total_jobs,
+                "percentage": percentage
+            }
+
+            if skill_lower in user_skills_lower:
+                have.append(skill_data)
+            else:
+                missing.append(skill_data)
+
+        # Sort by percentage (most common first)
+        have.sort(key=lambda x: x["percentage"], reverse=True)
+        missing.sort(key=lambda x: x["percentage"], reverse=True)
+
+        # Calculate match score
+        total_skills = len(have) + len(missing)
+        match_score = round((len(have) / total_skills * 100)) if total_skills > 0 else 0
+
+        return jsonify({
+            "success": True,
+            "target_role": target_role,
+            "total_jobs_analyzed": total_jobs,
+            "match_score": match_score,
+            "skills_you_have": have,
+            "skills_to_learn": missing,
+            "summary": {
+                "have_count": len(have),
+                "missing_count": len(missing),
+                "total_count": total_skills
+            }
+        })
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 if __name__ == "__main__":

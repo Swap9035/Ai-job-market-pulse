@@ -8,6 +8,8 @@ import JobCard from '../components/JobCard';
 import SalaryChart from '../components/SalaryChart';
 import LocationChart from '../components/LocationChart';
 import ExperienceChart from '../components/ExperienceChart';
+import InsightCards from '../components/InsightCards';
+import SkillTrendsChart from '../components/SkillTrendsChart';
 
 const API_URL = 'http://localhost:5000';
 
@@ -125,6 +127,12 @@ function Dashboard() {
 
       {/* Experience Chart */}
       <ExperienceChart />
+      
+       {/* Auto-generated Insights */}
+      <InsightCards />
+
+      {/* Skill Trends Over Time */}
+      <SkillTrendsChart />
 
       {/* Recent Jobs */}
       <div>

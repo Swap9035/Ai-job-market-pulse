@@ -22,7 +22,9 @@ CSV_PATH = os.path.join(
     'data',
     'jobs_in_data.csv'
 )
-print(f"Loading: {CSV_PATH}") 
+print(f"Loading: {CSV_PATH}")
+print("Exists:", os.path.exists(CSV_PATH))  
+print("Path:", CSV_PATH)    
 df = pd.read_csv(CSV_PATH)
 print(f"✅ Loaded {len(df)} rows, {len(df.columns)} columns")
 print(f"Columns: {df.columns.tolist()}")

@@ -14,6 +14,13 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from db import jobs_collection, skills_collection
+from services.analytics import (
+    get_salary_stats,
+    get_skill_trends,
+    get_auto_insights,
+    get_category_distribution,
+    get_experience_summary
+)
 import os
 
 load_dotenv()
@@ -413,6 +420,97 @@ def skill_gap():
             }
         })
 
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+# ────────────────────────────────────────────────────────────
+# ROUTE 11: Pandas Salary Statistics
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns detailed salary stats computed by pandas
+# Method  : GET
+# Params  : None
+# Returns : [ { category, avg_lpa, median_lpa, min_lpa,
+#               max_lpa, count } ]
+# Note    : Uses pandas groupby + agg — more powerful than
+#           MongoDB aggregation for complex statistics
+# ────────────────────────────────────────────────────────────
+@app.route("/api/analytics/salary-stats")
+def salary_stats():
+    try:
+        data = get_salary_stats()
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 12: Skill Trends Over Time
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns top 5 skill frequencies per year
+# Method  : GET
+# Params  : None
+# Returns : { data: [{year, Python, SQL, ...}], skills: [...] }
+# Note    : Uses pandas explode() to expand skill arrays
+#           then pivot_table() to reshape for charting
+# ────────────────────────────────────────────────────────────
+@app.route("/api/analytics/skill-trends")
+def skill_trends():
+    try:
+        data = get_skill_trends()
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 13: Auto-Generated Insights
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns statistical insights about the job market
+# Method  : GET
+# Params  : None
+# Returns : [ { icon, title, text, type } ]
+# Note    : Uses scipy t-test and Pearson correlation
+#           p < 0.05 = statistically significant difference
+# ────────────────────────────────────────────────────────────
+@app.route("/api/analytics/insights")
+def auto_insights():
+    try:
+        data = get_auto_insights()
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 14: Category Distribution
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns job count + percentage per category
+# Method  : GET
+# Params  : None
+# Returns : [ { category, count, percentage } ]
+# ────────────────────────────────────────────────────────────
+@app.route("/api/analytics/categories")
+def category_distribution():
+    try:
+        data = get_category_distribution()
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 15: Experience Summary
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns job count + avg salary per experience level
+# Method  : GET
+# Params  : None
+# Returns : [ { experience, count, avg_salary_lpa } ]
+# ────────────────────────────────────────────────────────────
+@app.route("/api/analytics/experience-summary")
+def experience_summary():
+    try:
+        data = get_experience_summary()
+        return jsonify({"success": True, "data": data})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

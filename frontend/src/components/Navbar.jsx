@@ -22,7 +22,8 @@ function Navbar() {
               { path: '/', label: 'Dashboard' },
               { path: '/skills', label: 'Skills' },
               { path: '/jobs', label: 'Jobs' },
-              { path: '/skill-gap', label: '🎯 Skill Gap' },
+              { path: '/skill-gap', label: ' Skill Gap' },
+              { path: '/predictions', label: ' Predictions' },
             ].map(({ path, label }) => (
               <Link
                 key={path}

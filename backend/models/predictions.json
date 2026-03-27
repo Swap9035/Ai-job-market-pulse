@@ -1,0 +1,182 @@
+{
+  "Python": {
+    "skill": "Python",
+    "historical": {
+      "2022": 1634,
+      "2023": 7453
+    },
+    "predicted_2024": 13272.0,
+    "predicted_2025": 19091.0,
+    "growth_rate": 78.1,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "SQL": {
+    "skill": "SQL",
+    "historical": {
+      "2022": 1448,
+      "2023": 6258
+    },
+    "predicted_2024": 11068.0,
+    "predicted_2025": 15878.0,
+    "growth_rate": 76.9,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Statistics": {
+    "skill": "Statistics",
+    "historical": {
+      "2022": 881,
+      "2023": 3995
+    },
+    "predicted_2024": 7109.0,
+    "predicted_2025": 10223.0,
+    "growth_rate": 77.9,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "TensorFlow": {
+    "skill": "TensorFlow",
+    "historical": {
+      "2022": 766,
+      "2023": 4022
+    },
+    "predicted_2024": 7278.0,
+    "predicted_2025": 10534.0,
+    "growth_rate": 81.0,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Machine Learning": {
+    "skill": "Machine Learning",
+    "historical": {
+      "2022": 580,
+      "2023": 2827
+    },
+    "predicted_2024": 5074.0,
+    "predicted_2025": 7321.0,
+    "growth_rate": 79.5,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "R": {
+    "skill": "R",
+    "historical": {
+      "2022": 580,
+      "2023": 2827
+    },
+    "predicted_2024": 5074.0,
+    "predicted_2025": 7321.0,
+    "growth_rate": 79.5,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Hadoop": {
+    "skill": "Hadoop",
+    "historical": {
+      "2022": 559,
+      "2023": 1958
+    },
+    "predicted_2024": 3357.0,
+    "predicted_2025": 4756.0,
+    "growth_rate": 71.5,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "AWS": {
+    "skill": "AWS",
+    "historical": {
+      "2022": 559,
+      "2023": 1958
+    },
+    "predicted_2024": 3357.0,
+    "predicted_2025": 4756.0,
+    "growth_rate": 71.5,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Kafka": {
+    "skill": "Kafka",
+    "historical": {
+      "2022": 559,
+      "2023": 1958
+    },
+    "predicted_2024": 3357.0,
+    "predicted_2025": 4756.0,
+    "growth_rate": 71.5,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Docker": {
+    "skill": "Docker",
+    "historical": {
+      "2022": 559,
+      "2023": 1958
+    },
+    "predicted_2024": 3357.0,
+    "predicted_2025": 4756.0,
+    "growth_rate": 71.5,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Spark": {
+    "skill": "Spark",
+    "historical": {
+      "2022": 559,
+      "2023": 1958
+    },
+    "predicted_2024": 3357.0,
+    "predicted_2025": 4756.0,
+    "growth_rate": 71.5,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Tableau": {
+    "skill": "Tableau",
+    "historical": {
+      "2022": 309,
+      "2023": 1473
+    },
+    "predicted_2024": 2637.0,
+    "predicted_2025": 3801.0,
+    "growth_rate": 79.0,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Power BI": {
+    "skill": "Power BI",
+    "historical": {
+      "2022": 309,
+      "2023": 1473
+    },
+    "predicted_2024": 2637.0,
+    "predicted_2025": 3801.0,
+    "growth_rate": 79.0,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Excel": {
+    "skill": "Excel",
+    "historical": {
+      "2022": 309,
+      "2023": 1473
+    },
+    "predicted_2024": 2637.0,
+    "predicted_2025": 3801.0,
+    "growth_rate": 79.0,
+    "r2_score": 1.0,
+    "trend": "rising"
+  },
+  "Deep Learning": {
+    "skill": "Deep Learning",
+    "historical": {
+      "2022": 186,
+      "2023": 1195
+    },
+    "predicted_2024": 2204.0,
+    "predicted_2025": 3213.0,
+    "growth_rate": 84.4,
+    "r2_score": 1.0,
+    "trend": "rising"
+  }
+}

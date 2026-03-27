@@ -21,6 +21,12 @@ from services.analytics import (
     get_category_distribution,
     get_experience_summary
 )
+from services.predictions import (
+    get_all_predictions,
+    get_rising_skills,
+    predict_skill,
+    get_best_skills_to_learn
+)
 import os
 
 load_dotenv()
@@ -514,7 +520,90 @@ def experience_summary():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+# ────────────────────────────────────────────────────────────
+# ROUTE 16: All Skill Predictions
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns ML predictions for all skills
+# Method  : GET
+# Params  : None
+# Returns : List of predictions sorted by growth rate
+# Note    : Loads pre-computed predictions from JSON file
+#           No model.predict() called here — uses cached results
+# ────────────────────────────────────────────────────────────
+@app.route("/api/predictions/skills")
+def all_predictions():
+    try:
+        data = get_all_predictions()
+        return jsonify({
+            "success": True,
+            "count": len(data),
+            "data": data
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 17: Rising Skills
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns only skills with positive growth trend
+# Method  : GET
+# Params  : None
+# Returns : List of rising skills with growth rates
+# ────────────────────────────────────────────────────────────
+@app.route("/api/predictions/rising")
+def rising_skills():
+    try:
+        data = get_rising_skills()
+        return jsonify({
+            "success": True,
+            "count": len(data),
+            "data": data
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 18: Predict Specific Skill
+# ────────────────────────────────────────────────────────────
+# Purpose : Real-time prediction for one skill + year
+# Method  : GET
+# Params  : /api/predictions/skill/Python?year=2025
+# Returns : { skill, year, predicted_job_count, trend }
+# Note    : This actually calls model.predict() in real time
+#           Shows the ML model working live
+# ────────────────────────────────────────────────────────────
+@app.route("/api/predictions/skill/<skill_name>")
+def predict_one_skill(skill_name):
+    try:
+        year = int(request.args.get("year", 2024))
+        data = predict_skill(skill_name, year)
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 19: Best Skills to Learn
+# ────────────────────────────────────────────────────────────
+# Purpose : Ranks skills by predicted future demand
+# Method  : GET
+# Params  : ?year=2025 (optional, default 2025)
+# Returns : Skills ranked HIGH/MEDIUM/LOW priority
+# ────────────────────────────────────────────────────────────
+@app.route("/api/predictions/best-to-learn")
+def best_to_learn():
+    try:
+        year = int(request.args.get("year", 2025))
+        data = get_best_skills_to_learn(year)
+        return jsonify({
+            "success": True,
+            "target_year": year,
+            "data": data
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 # ────────────────────────────────────────────────────────────
 # Run the development server
 # ────────────────────────────────────────────────────────────

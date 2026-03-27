@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Skills from './pages/Skills';
 import JobList from './pages/JobList';
 import SkillGap from './pages/SkillGap';
+import Predictions from './pages/Predictions';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/skills" element={<Skills />} />
             <Route path="/jobs" element={<JobList />} />
             <Route path="/skill-gap" element={<SkillGap />} />
+            <Route path="/predictions" element={<Predictions />} />
           </Routes>
         </main>
       </div>

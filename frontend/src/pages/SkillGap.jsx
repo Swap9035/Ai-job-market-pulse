@@ -7,7 +7,6 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000';
 
-// All available roles matching our MongoDB categories
 const ROLES = [
   "Data Analysis",
   "Machine Learning",
@@ -16,7 +15,6 @@ const ROLES = [
   "Business Intelligence"
 ];
 
-// Common skills as quick-select chips
 const COMMON_SKILLS = [
   "Python", "SQL", "Excel", "Power BI", "Tableau",
   "Machine Learning", "Statistics", "R", "TensorFlow",
@@ -25,7 +23,6 @@ const COMMON_SKILLS = [
 ];
 
 function SkillGap() {
-  // Step tracking — 1: select skills, 2: select role, 3: see results
   const [step, setStep] = useState(1);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [customSkill, setCustomSkill] = useState('');
@@ -33,8 +30,10 @@ function SkillGap() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [aiAdvice, setAiAdvice] = useState(null);
+  const [loadingAi, setLoadingAi] = useState(false);
+  const [showAi, setShowAi] = useState(false);
 
-  // Toggle skill selection
   const toggleSkill = (skill) => {
     setSelectedSkills(prev =>
       prev.includes(skill)
@@ -43,7 +42,6 @@ function SkillGap() {
     );
   };
 
-  // Add custom skill typed by user
   const addCustomSkill = () => {
     const trimmed = customSkill.trim();
     if (trimmed && !selectedSkills.includes(trimmed)) {
@@ -52,7 +50,6 @@ function SkillGap() {
     }
   };
 
-  // Call the API
   const analyzeGap = async () => {
     if (!targetRole) {
       setError('Please select a target role');
@@ -74,13 +71,30 @@ function SkillGap() {
     }
   };
 
-  // Reset everything
+  const getAiAdvice = async () => {
+    setLoadingAi(true);
+    setShowAi(true);
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/ai/career-advice`,
+        result
+      );
+      setAiAdvice(response.data.data);
+    } catch (err) {
+      setAiAdvice({ error: 'Failed to get AI advice. Check your Groq API key.' });
+    } finally {
+      setLoadingAi(false);
+    }
+  };
+
   const reset = () => {
     setStep(1);
     setSelectedSkills([]);
     setTargetRole('');
     setResult(null);
     setError('');
+    setAiAdvice(null);
+    setShowAi(false);
   };
 
   return (
@@ -115,7 +129,7 @@ function SkillGap() {
         ))}
       </div>
 
-      {/* ── STEP 1: Select Your Skills ── */}
+      {/* STEP 1: Select Your Skills */}
       {step === 1 && (
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
           <div>
@@ -127,7 +141,6 @@ function SkillGap() {
             </p>
           </div>
 
-          {/* Skill chips */}
           <div className="flex flex-wrap gap-2">
             {COMMON_SKILLS.map(skill => (
               <button
@@ -144,7 +157,6 @@ function SkillGap() {
             ))}
           </div>
 
-          {/* Custom skill input */}
           <div>
             <p className="text-sm text-gray-500 mb-2">
               Add a skill not listed above:
@@ -167,7 +179,6 @@ function SkillGap() {
             </div>
           </div>
 
-          {/* Selected skills preview */}
           {selectedSkills.length > 0 && (
             <div className="bg-blue-50 rounded-lg p-4">
               <p className="text-sm font-medium text-blue-700 mb-2">
@@ -198,7 +209,7 @@ function SkillGap() {
         </div>
       )}
 
-      {/* ── STEP 2: Select Target Role ── */}
+      {/* STEP 2: Select Target Role */}
       {step === 2 && (
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
           <div>
@@ -262,7 +273,7 @@ function SkillGap() {
         </div>
       )}
 
-      {/* ── STEP 3: Results ── */}
+      {/* STEP 3: Results */}
       {step === 3 && result && (
         <div className="space-y-4">
 
@@ -277,7 +288,6 @@ function SkillGap() {
                   Based on {result.total_jobs_analyzed} job postings
                 </p>
               </div>
-              {/* Big score circle */}
               <div className={`w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold border-4 ${
                 result.match_score >= 70
                   ? 'border-green-400 text-green-600 bg-green-50'
@@ -289,7 +299,6 @@ function SkillGap() {
               </div>
             </div>
 
-            {/* Progress bar */}
             <div className="w-full bg-gray-100 rounded-full h-3">
               <div
                 className={`h-3 rounded-full transition-all ${
@@ -301,7 +310,6 @@ function SkillGap() {
               ></div>
             </div>
 
-            {/* Summary */}
             <div className="flex gap-4 mt-4">
               <div className="flex-1 bg-green-50 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-green-600">
@@ -324,7 +332,7 @@ function SkillGap() {
             </div>
           </div>
 
-          {/* Skills to Learn (Missing) */}
+          {/* Skills to Learn */}
           {result.skills_to_learn.length > 0 && (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="font-semibold text-gray-900 mb-4">
@@ -381,7 +389,7 @@ function SkillGap() {
             </div>
           )}
 
-          {/* Action buttons */}
+          {/* Action Buttons */}
           <div className="flex gap-3">
             <button
               onClick={reset}
@@ -395,6 +403,142 @@ function SkillGap() {
             >
               Find Courses on Coursera →
             </button>
+          </div>
+
+          {/* AI Career Advisor Section */}
+          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <span className="text-xl">🤖</span>
+                  AI Career Advisor
+                </h3>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Powered by Groq (Llama3) — personalized advice for your skill gap
+                </p>
+              </div>
+              {!showAi && (
+                <button
+                  onClick={getAiAdvice}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+                >
+                  Get AI Advice ✨
+                </button>
+              )}
+            </div>
+
+            {/* Loading state */}
+            {loadingAi && (
+              <div className="flex items-center gap-3 py-4">
+                <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-purple-600 text-sm">
+                  AI is analyzing your skill gap...
+                </p>
+              </div>
+            )}
+
+            {/* AI Advice Result */}
+            {aiAdvice && !loadingAi && (
+              <div className="space-y-4">
+                {aiAdvice.error ? (
+                  <p className="text-red-500 text-sm">{aiAdvice.error}</p>
+                ) : (
+                  <>
+                    {/* Assessment */}
+                    {aiAdvice.assessment && (
+                      <div className="bg-white rounded-lg p-4 border border-purple-100">
+                        <p className="text-xs font-semibold text-purple-600 mb-1">
+                          📋 ASSESSMENT
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          {aiAdvice.assessment}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Learning Roadmap */}
+                    {aiAdvice.roadmap && aiAdvice.roadmap.length > 0 && (
+                      <div className="bg-white rounded-lg p-4 border border-purple-100">
+                        <p className="text-xs font-semibold text-purple-600 mb-3">
+                          🗺️ 3-MONTH LEARNING ROADMAP
+                        </p>
+                        <div className="space-y-3">
+                          {aiAdvice.roadmap.map((item, i) => (
+                            <div key={i} className="flex gap-3">
+                              <div className="w-8 h-8 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                                {item.month}
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900 text-sm">
+                                  {item.skill}
+                                  <span className="ml-2 text-xs text-gray-400">
+                                    {item.time_needed}
+                                  </span>
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                  {item.reason}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Resources */}
+                    {aiAdvice.resources && aiAdvice.resources.length > 0 && (
+                      <div className="bg-white rounded-lg p-4 border border-purple-100">
+                        <p className="text-xs font-semibold text-purple-600 mb-3">
+                          📚 FREE LEARNING RESOURCES
+                        </p>
+                        {aiAdvice.resources.map((item, i) => (
+                          <div key={i} className="mb-3">
+                            <p className="text-sm font-medium text-gray-800 mb-1">
+                              {item.skill}
+                            </p>
+                            <div className="space-y-1">
+                              {item.resources && item.resources.map((r, j) => (
+                                <a
+                                  key={j}
+                                  href={r.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-xs text-blue-600 hover:underline"
+                                >
+                                  <span className="text-green-500">
+                                    {r.type === 'free' ? '🆓' : '💰'}
+                                  </span>
+                                  {r.name}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Market Insight */}
+                    {aiAdvice.market_insight && (
+                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                        <p className="text-xs font-semibold text-blue-600 mb-1">
+                          💡 INDIAN MARKET INSIGHT
+                        </p>
+                        <p className="text-sm text-blue-800">
+                          {aiAdvice.market_insight}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Token usage */}
+                    {aiAdvice.tokens_used && (
+                      <p className="text-xs text-gray-300 text-right">
+                        Tokens used: {aiAdvice.tokens_used}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
         </div>

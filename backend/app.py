@@ -27,6 +27,11 @@ from services.predictions import (
     predict_skill,
     get_best_skills_to_learn
 )
+from services.ai_advisor import (
+    get_career_advice,
+    explain_skill,
+    generate_resume_bullets
+)
 import os
 
 load_dotenv()
@@ -602,6 +607,81 @@ def best_to_learn():
             "target_year": year,
             "data": data
         })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+# ────────────────────────────────────────────────────────────
+# ROUTE 20: AI Career Advice
+# ────────────────────────────────────────────────────────────
+# Purpose : Generate personalized career advice using OpenAI
+# Method  : POST
+# Params  : Request body = skill gap result from /api/skill-gap
+# Returns : {
+#     assessment: "...",
+#     roadmap: [...],
+#     resources: [...],
+#     market_insight: "..."
+#   }
+# Cost    : ~$0.001 per request (gpt-4o-mini is very cheap)
+# Note    : Pass the FULL response from /api/skill-gap as body
+# ────────────────────────────────────────────────────────────
+@app.route("/api/ai/career-advice", methods=["POST"])
+def career_advice():
+    try:
+        skill_gap_data = request.get_json()
+        if not skill_gap_data:
+            return jsonify({
+                "success": False,
+                "error": "Send skill gap data in request body"
+            }), 400
+
+        result = get_career_advice(skill_gap_data)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 21: Explain a Skill
+# ────────────────────────────────────────────────────────────
+# Purpose : Returns AI explanation of why a skill matters
+# Method  : GET
+# Params  : /api/ai/explain/Python?role=Machine Learning
+# Returns : { skill, explanation }
+# ────────────────────────────────────────────────────────────
+@app.route("/api/ai/explain/<skill_name>")
+def explain_skill_route(skill_name):
+    try:
+        role = request.args.get("role", "Data Scientist")
+        result = explain_skill(skill_name, role)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ────────────────────────────────────────────────────────────
+# ROUTE 22: Generate Resume Bullets
+# ────────────────────────────────────────────────────────────
+# Purpose : AI-generated resume bullet points for skills
+# Method  : POST
+# Params  : { "skills": [...], "target_role": "..." }
+# Returns : [ { bullet, skill_highlighted } ]
+# ────────────────────────────────────────────────────────────
+@app.route("/api/ai/resume-bullets", methods=["POST"])
+def resume_bullets():
+    try:
+        body = request.get_json()
+        skills = body.get("skills", [])
+        target_role = body.get("target_role", "Data Scientist")
+
+        if not skills:
+            return jsonify({
+                "success": False,
+                "error": "Provide skills array in request body"
+            }), 400
+
+        result = generate_resume_bullets(skills, target_role)
+        return jsonify(result)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 # ────────────────────────────────────────────────────────────

@@ -43,10 +43,19 @@ function Dashboard() {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="text-center">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-        <p className="text-gray-500">Loading job market data...</p>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1,2,3].map(i => (
+          <div key={i} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 animate-pulse">
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-3"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2"></div>
+            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+          </div>
+        ))}
+      </div>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 animate-pulse">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4"></div>
+        <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded"></div>
       </div>
     </div>
   );
@@ -70,19 +79,19 @@ function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Total Jobs</p>
-          <p className="text-3xl font-bold text-gray-900">{jobs.length}</p>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Jobs</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{jobs.length}</p>
           <p className="text-xs text-green-600 mt-1">↑ Updated today</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Unique Skills</p>
-          <p className="text-3xl font-bold text-gray-900">{skills.length}</p>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Unique Skills</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{skills.length}</p>
           <p className="text-xs text-blue-600 mt-1">Across all roles</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Job Categories</p>
-          <p className="text-3xl font-bold text-gray-900">{categories.length}</p>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Job Categories</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{categories.length}</p>
           <p className="text-xs text-purple-600 mt-1">Specializations tracked</p>
         </div>
       </div>

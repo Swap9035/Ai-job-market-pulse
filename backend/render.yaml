@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ai-job-market-pulse-api
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn backend.app:app
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false

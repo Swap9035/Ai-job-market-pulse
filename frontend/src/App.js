@@ -7,6 +7,8 @@ import Skills from './pages/Skills';
 import JobList from './pages/JobList';
 import SkillGap from './pages/SkillGap';
 import Predictions from './pages/Predictions';
+import ErrorBoundary from './components/ErrorBoundary';
+import ApiStatus from './components/ApiStatus';
 
 function App() {
   // Check localStorage for saved preference
@@ -34,14 +36,14 @@ function App() {
         <Navbar
           darkMode={darkMode}
           setDarkMode={setDarkMode}
-        />
+        /><ApiStatus />
         <main className="max-w-7xl mx-auto px-4 py-6">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/skills" element={<Skills />} />
-            <Route path="/jobs" element={<JobList />} />
-            <Route path="/skill-gap" element={<SkillGap />} />
-            <Route path="/predictions" element={<Predictions />} />
+           <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+            <Route path="/skills" element={<ErrorBoundary><Skills /></ErrorBoundary>} />
+            <Route path="/jobs" element={<ErrorBoundary><JobList /></ErrorBoundary>} />
+            <Route path="/skill-gap" element={<ErrorBoundary><SkillGap /></ErrorBoundary>} />
+            <Route path="/predictions" element={<ErrorBoundary><Predictions /></ErrorBoundary>} />
           </Routes>
         </main>
       </div>

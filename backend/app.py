@@ -41,7 +41,36 @@ app = Flask(__name__)
 # CORS allows React on port 3000 to call Flask on port 5000
 # Without this, browsers block cross-origin requests (security rule)
 CORS(app)
+# ────────────────────────────────────────────────────────────
+# Global Error Handlers
+# ────────────────────────────────────────────────────────────
+# These catch errors that slip through individual route handlers
+# Returns clean JSON instead of raw HTML error pages
+# This is critical for production — never show Python tracebacks
 
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({
+        "success": False,
+        "error": "Route not found",
+        "message": "Check the API documentation for valid endpoints"
+    }), 404
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return jsonify({
+        "success": False,
+        "error": "Method not allowed",
+        "message": "Check if you're using GET vs POST correctly"
+    }), 405
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify({
+        "success": False,
+        "error": "Internal server error",
+        "message": str(e)
+    }), 500
 
 # ────────────────────────────────────────────────────────────
 # ROUTE 1: Health Check

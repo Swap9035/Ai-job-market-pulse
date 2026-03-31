@@ -14,29 +14,53 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from db import jobs_collection, skills_collection
-from services.analytics import (
-    get_salary_stats,
-    get_skill_trends,
-    get_auto_insights,
-    get_category_distribution,
-    get_experience_summary
-)
-from services.predictions import (
-    get_all_predictions,
-    get_rising_skills,
-    predict_skill,
-    get_best_skills_to_learn
-)
-from services.ai_advisor import (
-    get_career_advice,
-    explain_skill,
-    generate_resume_bullets
-)
 import os
+
+ANALYTICS_IMPORT_ERROR = None
+PREDICTIONS_IMPORT_ERROR = None
+AI_ADVISOR_IMPORT_ERROR = None
+
+try:
+    from services.analytics import (
+        get_salary_stats,
+        get_skill_trends,
+        get_auto_insights,
+        get_category_distribution,
+        get_experience_summary
+    )
+except Exception as e:
+    ANALYTICS_IMPORT_ERROR = str(e)
+
+try:
+    from services.predictions import (
+        get_all_predictions,
+        get_rising_skills,
+        predict_skill,
+        get_best_skills_to_learn
+    )
+except Exception as e:
+    PREDICTIONS_IMPORT_ERROR = str(e)
+
+try:
+    from services.ai_advisor import (
+        get_career_advice,
+        explain_skill,
+        generate_resume_bullets
+    )
+except Exception as e:
+    AI_ADVISOR_IMPORT_ERROR = str(e)
 
 load_dotenv()
 
 app = Flask(__name__)
+
+
+def _service_unavailable(error_message):
+    return jsonify({
+        "success": False,
+        "error": "Service unavailable",
+        "message": error_message
+    }), 503
 
 # CORS allows React on port 3000 to call Flask on port 5000
 # Without this, browsers block cross-origin requests (security rule)
@@ -477,6 +501,8 @@ def skill_gap():
 @app.route("/api/analytics/salary-stats")
 def salary_stats():
     try:
+        if ANALYTICS_IMPORT_ERROR:
+            return _service_unavailable(ANALYTICS_IMPORT_ERROR)
         data = get_salary_stats()
         return jsonify({"success": True, "data": data})
     except Exception as e:
@@ -496,6 +522,8 @@ def salary_stats():
 @app.route("/api/analytics/skill-trends")
 def skill_trends():
     try:
+        if ANALYTICS_IMPORT_ERROR:
+            return _service_unavailable(ANALYTICS_IMPORT_ERROR)
         data = get_skill_trends()
         return jsonify({"success": True, "data": data})
     except Exception as e:
@@ -515,6 +543,8 @@ def skill_trends():
 @app.route("/api/analytics/insights")
 def auto_insights():
     try:
+        if ANALYTICS_IMPORT_ERROR:
+            return _service_unavailable(ANALYTICS_IMPORT_ERROR)
         data = get_auto_insights()
         return jsonify({"success": True, "data": data})
     except Exception as e:
@@ -532,6 +562,8 @@ def auto_insights():
 @app.route("/api/analytics/categories")
 def category_distribution():
     try:
+        if ANALYTICS_IMPORT_ERROR:
+            return _service_unavailable(ANALYTICS_IMPORT_ERROR)
         data = get_category_distribution()
         return jsonify({"success": True, "data": data})
     except Exception as e:
@@ -549,6 +581,8 @@ def category_distribution():
 @app.route("/api/analytics/experience-summary")
 def experience_summary():
     try:
+        if ANALYTICS_IMPORT_ERROR:
+            return _service_unavailable(ANALYTICS_IMPORT_ERROR)
         data = get_experience_summary()
         return jsonify({"success": True, "data": data})
     except Exception as e:
@@ -567,6 +601,8 @@ def experience_summary():
 @app.route("/api/predictions/skills")
 def all_predictions():
     try:
+        if PREDICTIONS_IMPORT_ERROR:
+            return _service_unavailable(PREDICTIONS_IMPORT_ERROR)
         data = get_all_predictions()
         return jsonify({
             "success": True,
@@ -588,6 +624,8 @@ def all_predictions():
 @app.route("/api/predictions/rising")
 def rising_skills():
     try:
+        if PREDICTIONS_IMPORT_ERROR:
+            return _service_unavailable(PREDICTIONS_IMPORT_ERROR)
         data = get_rising_skills()
         return jsonify({
             "success": True,
@@ -611,6 +649,8 @@ def rising_skills():
 @app.route("/api/predictions/skill/<skill_name>")
 def predict_one_skill(skill_name):
     try:
+        if PREDICTIONS_IMPORT_ERROR:
+            return _service_unavailable(PREDICTIONS_IMPORT_ERROR)
         year = int(request.args.get("year", 2024))
         data = predict_skill(skill_name, year)
         return jsonify({"success": True, "data": data})
@@ -629,6 +669,8 @@ def predict_one_skill(skill_name):
 @app.route("/api/predictions/best-to-learn")
 def best_to_learn():
     try:
+        if PREDICTIONS_IMPORT_ERROR:
+            return _service_unavailable(PREDICTIONS_IMPORT_ERROR)
         year = int(request.args.get("year", 2025))
         data = get_best_skills_to_learn(year)
         return jsonify({
@@ -657,6 +699,8 @@ def best_to_learn():
 @app.route("/api/ai/career-advice", methods=["POST"])
 def career_advice():
     try:
+        if AI_ADVISOR_IMPORT_ERROR:
+            return _service_unavailable(AI_ADVISOR_IMPORT_ERROR)
         skill_gap_data = request.get_json()
         if not skill_gap_data:
             return jsonify({
@@ -681,6 +725,8 @@ def career_advice():
 @app.route("/api/ai/explain/<skill_name>")
 def explain_skill_route(skill_name):
     try:
+        if AI_ADVISOR_IMPORT_ERROR:
+            return _service_unavailable(AI_ADVISOR_IMPORT_ERROR)
         role = request.args.get("role", "Data Scientist")
         result = explain_skill(skill_name, role)
         return jsonify(result)
@@ -699,6 +745,8 @@ def explain_skill_route(skill_name):
 @app.route("/api/ai/resume-bullets", methods=["POST"])
 def resume_bullets():
     try:
+        if AI_ADVISOR_IMPORT_ERROR:
+            return _service_unavailable(AI_ADVISOR_IMPORT_ERROR)
         body = request.get_json()
         skills = body.get("skills", [])
         target_role = body.get("target_role", "Data Scientist")

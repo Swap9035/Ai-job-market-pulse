@@ -5,18 +5,35 @@
 # Free tier: 14,400 requests/day — more than enough!
 # ============================================================
 
-from groq import Groq
+try:
+    from groq import Groq
+except ImportError:
+    Groq = None
 from dotenv import load_dotenv
 import os
 import json
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 MODEL = "llama-3.3-70b-versatile"  # free, fast, smart
 
 
+def _get_client():
+    if Groq is None:
+        return None, "groq package is not installed"
+
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        return None, "GROQ_API_KEY is not configured"
+
+    return Groq(api_key=api_key), None
+
+
 def get_career_advice(skill_gap_data):
+    client, error = _get_client()
+    if error:
+        return {"success": False, "error": error}
+
     target_role = skill_gap_data.get('target_role', 'Data Scientist')
     match_score = skill_gap_data.get('match_score', 0)
     skills_have = [s['skill'] for s in skill_gap_data.get('skills_you_have', [])]
@@ -94,6 +111,10 @@ def get_career_advice(skill_gap_data):
 
 
 def explain_skill(skill_name, target_role):
+    client, error = _get_client()
+    if error:
+        return {"success": False, "error": error}
+
     try:
         response = client.chat.completions.create(
             model=MODEL,
@@ -120,6 +141,10 @@ def explain_skill(skill_name, target_role):
 
 
 def generate_resume_bullets(skills, target_role):
+    client, error = _get_client()
+    if error:
+        return {"success": False, "error": error}
+
     try:
         response = client.chat.completions.create(
             model=MODEL,

@@ -3,8 +3,7 @@
 
 import React from 'react';
 import {
-  PieChart, Pie, Cell, Tooltip,
-  Legend, ResponsiveContainer
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer
 } from 'recharts';
 import useApi from '../hooks/useApi';
 

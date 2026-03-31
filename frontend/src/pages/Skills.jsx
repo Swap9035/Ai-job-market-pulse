@@ -7,8 +7,7 @@ import {
   Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
 
-const API_URL = 'http://localhost:5000';
-
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 // Color based on skill category
 const CATEGORY_COLORS = {
   'Programming': '#3b82f6',

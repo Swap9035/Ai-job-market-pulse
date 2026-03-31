@@ -11,7 +11,7 @@ import ExperienceChart from '../components/ExperienceChart';
 import InsightCards from '../components/InsightCards';
 import SkillTrendsChart from '../components/SkillTrendsChart';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function Dashboard() {
   const [jobs, setJobs] = useState([]);

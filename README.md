@@ -40,3 +40,4 @@ ai-job-market-pulse/
 
 ##  Author
 Swapnil Patil | Swap9035
+

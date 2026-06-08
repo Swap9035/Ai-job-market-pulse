@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ai-job-market-pulse-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python data/generate_data.py
+    startCommand: python app.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        value: sk-your-openai-key-here

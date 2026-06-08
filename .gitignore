@@ -12,8 +12,6 @@ dist/
 .vite/
 
 # Data / Secrets
-backend/data/jobs.csv
-backend/data/skill_trends.csv
 *.env
 
 # OS

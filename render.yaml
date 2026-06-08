@@ -4,9 +4,11 @@ services:
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt && python data/generate_data.py
-    startCommand: python app.py
+    startCommand: gunicorn app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: FLASK_ENV
         value: production
       - key: OPENAI_API_KEY
         value: sk-your-openai-key-here
+      - key: PYTHON_VERSION
+        value: "3.11.0"

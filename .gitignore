@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Data / Secrets
+backend/data/jobs.csv
+backend/data/skill_trends.csv
+*.env
+
+# OS
+.DS_Store
+Thumbs.db

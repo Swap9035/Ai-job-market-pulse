@@ -124,4 +124,4 @@ ai-job-market-pulse/
 
 ---
 
-*Built as a portfolio capstone project — 3rd year Data Science student*
+
